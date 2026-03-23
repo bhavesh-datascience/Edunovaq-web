@@ -26,19 +26,20 @@
     </nav>
 
     <main class="main-container">
-        <header class="top-header">
-            <div class="search-bar glass-style"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Search tools..."></div>
-            <div class="header-actions">
-                <i class="fa-regular fa-bell" style="font-size: 20px;"></i>
-                <div class="user-profile glass-style">
-                    <div id="profile-img-placeholder" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; border: 1px solid rgba(255,255,255,0.4);">
-                        U
-                    </div>
-                    <span id="profile-name-display">Loading...</span>
-                </div>
-                <i class="fa-solid fa-arrow-right-from-bracket" id="logout-icon" style="font-size: 20px; cursor: pointer; color: rgba(255,255,255,0.7);" title="Logout"></i>
+       <header class="top-header" style="justify-content: flex-end; width: 100%;">
+    <div class="header-actions" style="display: flex; align-items: center; gap: 20px;">
+        <i class="fa-regular fa-bell" style="font-size: 20px; cursor: pointer;"></i>
+        
+        <div class="user-profile glass-style">
+            <div id="profile-img-placeholder" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; border: 1px solid rgba(255,255,255,0.4);">
+                U
             </div>
-        </header>
+            <span id="profile-name-display">Loading...</span>
+        </div>
+        
+        <i class="fa-solid fa-arrow-right-from-bracket" id="logout-icon" style="font-size: 20px; cursor: pointer; color: rgba(255,255,255,0.7);" title="Logout"></i>
+    </div>
+</header>
 
         <h1 class="page-title">AI Study Suite</h1>
 
@@ -73,6 +74,14 @@
                 <h2>AI Chart Maker</h2>
                 <p>Generate flowcharts and diagrams instantly from descriptions.</p>
                 <a href="charts.html" class="card-btn" style="text-decoration: none; display: inline-block; margin-top: auto;">Launch</a>
+            </div>
+            <div class="tool-card glass-style" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                <div class="icon-wrapper" style="background: rgba(255,255,255,0.1); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                    <i class="fa-solid fa-calendar-day" style="font-size: 24px; color: #fff;"></i>
+                </div>
+                <h2>AI Scheduler</h2>
+                <p>Type your goals for the day and get a structured timetable.</p>
+                <a href="ai-scheduler.html" class="card-btn" style="text-decoration: none; display: inline-block; margin-top: auto;">Launch</a>
             </div>
         </div>
     </main>

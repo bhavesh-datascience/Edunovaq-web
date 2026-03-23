@@ -172,6 +172,8 @@ class PDFChatRequest(BaseModel):
     message: str
     pdf_name: str 
     history: List[ChatMessage] = []
+class ScheduleGenRequest(BaseModel):
+    prompt: str
 
 # ==========================================
 # 4. APP & AI SETUP
@@ -529,6 +531,36 @@ def generate_mermaid_chart(request: ChartRequest):
         return {"status": "success", "mermaid_code": clean_code}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/api/generate-schedule")
+def generate_schedule(request: ScheduleGenRequest):
+    try:
+        # Prompt explicitly asks for a JSON array to make table generation easy on the frontend
+        prompt = f"""
+        You are an expert time management and productivity assistant. 
+        Create a practical, well-structured daily schedule based on this user input: "{request.prompt}"
+        
+        Return ONLY a raw JSON array of objects. Do not include markdown formatting (no ```json).
+        Each object must have exactly these three keys:
+        - "time": (e.g., "09:00 AM - 10:30 AM")
+        - "task": (e.g., "Math Study Session")
+        - "description": (Brief details or focus areas)
+        """
+        
+        response = model.generate_content(prompt)
+        
+        # Clean potential markdown formatting
+        clean_json = response.text.replace("```json", "").replace("```", "").strip()
+        
+        try:
+            schedule_data = json.loads(clean_json)
+        except json.JSONDecodeError:
+            # Fallback in case the AI outputs conversational text instead of strict JSON
+            schedule_data = [{"time": "Error", "task": "Formatting Issue", "description": clean_json}]
+            
+        return {"status": "success", "schedule": schedule_data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 # ==========================================
 # 8. HTML PAGE ROUTING
 # ==========================================
@@ -541,6 +573,8 @@ def get_details_page():
     if not os.path.exists("details.html"): raise HTTPException(status_code=404, detail="details.html not found")
     return FileResponse("details.html")
 app.mount("/", StaticFiles(directory=".", html=True), name="static")
+
+
 
 if __name__ == "__main__":
     import uvicorn
