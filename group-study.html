@@ -44,16 +44,16 @@
 
         <div class="tools-grid">
             <div class="study-card glass-style">
-                <div class="icon-wrapper"><i class="fa-solid fa-globe"></i></div>
-                <h2>Public Rooms</h2>
-                <p>Study with students worldwide.</p>
-                <button class="card-btn" id="public-room-btn">Join Room</button>
+                <div class="icon-wrapper"><i class="fa-solid fa-user-group"></i></div>
+                <h2>Meet with friend</h2>
+                <p>Create a private room to study with your friends.</p>
+                <button class="card-btn" id="private-circle-btn">Create Room</button>
             </div>
             <div class="study-card glass-style">
-                <div class="icon-wrapper"><i class="fa-solid fa-lock"></i></div>
-                <h2>Private Circle</h2>
-                <p>Invite friends and study together.</p>
-                <button class="card-btn" id="private-circle-btn">Create Room</button>
+                <div class="icon-wrapper"><i class="fa-solid fa-globe"></i></div>
+                <h2>Study with others</h2>
+                <p>Join public rooms to study with students worldwide.</p>
+                <button class="card-btn" id="public-room-btn">Join Room</button>
             </div>
         </div>
     </main>
@@ -66,7 +66,6 @@
             const publicRoomBtn = document.getElementById("public-room-btn");
             const profileNameDisplay = document.getElementById("profile-name-display");
 
-            // Helper function to grab the user's name silently
             function getUserName() {
                 let userName = localStorage.getItem("username") || profileNameDisplay.innerText;
                 if (!userName || userName === "Loading..." || userName === "U") {
@@ -75,26 +74,31 @@
                 return userName;
             }
 
-            // Logic for Private Circle (Creates a random room)
+            // Logic for "Meet with friend"
             privateCircleBtn.addEventListener("click", () => {
                 const userName = getUserName();
-                const roomName = "EdunovaqPrivateCircle_" + Math.random().toString(36).substring(7);
+                const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+                const roomName = "Edunovaq-Private-" + randomId;
 
                 localStorage.setItem("currentStudyRoom", roomName);
                 localStorage.setItem("studyRoomUser", userName);
-                window.location.href = "study-room.html";
+
+                navigator.clipboard.writeText(roomName).then(() => {
+                    alert(`Room Created!\n\nThe Room Code "${roomName}" has been copied to your clipboard.\n\nSend this code to your friend. They can join by clicking "Join Room" and pasting this code.`);
+                    window.location.href = "study-room.html";
+                }).catch(err => {
+                    alert(`Room Created!\n\nShare this exact Room Code with your friend: ${roomName}`);
+                    window.location.href = "study-room.html";
+                });
             });
 
-            // Logic for Public Rooms (Prompts for a room name or uses default)
+            // Logic for "Study with others" / Joining a friend
             publicRoomBtn.addEventListener("click", () => {
                 const userName = getUserName();
                 
-                // Ask the user what room they want to join, providing a default lobby
-                const roomInput = prompt("Enter the public room name to join:", "EdunovaqGlobalLobby");
+                const roomInput = prompt("Enter a Room Code (or leave as default to join the Global Lobby):", "EdunovaqGlobalLobby");
                 
-                // If they clicked "OK" and didn't leave it completely blank
                 if (roomInput !== null && roomInput.trim() !== "") {
-                    // Remove spaces to make it a valid Jitsi room URL
                     const formattedRoomName = roomInput.trim().replace(/\s+/g, '');
                     
                     localStorage.setItem("currentStudyRoom", formattedRoomName);

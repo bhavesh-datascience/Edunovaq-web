@@ -2,109 +2,147 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edunovaq - Active Study Room</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="dashboard-styles.css">
-    <script src="https://meet.jit.si/external_api.js"></script>
+    <script src="https://8x8.vc/vpaas-magic-cookie-0173a0b920f94c92ba407b9fd59fc259/external_api.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+        
+        #jitsi-container {
+            position: absolute; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99999;
+        }
+
+        #fullscreen-btn {
+            position: absolute;
+            bottom: 25px;
+            left: 25px;
+            z-index: 100000;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        #fullscreen-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
 </head>
 <body>
-    <nav class="sidebar glass-style">
-        <div class="brand">
-            <div class="icon-container"><i class="fa-solid fa-plus-circle"></i></div>
-            <span class="nav-text brand-text">Edunovaq</span>
-        </div>
-        <ul class="nav-list">
-            <li class="nav-item"><a href="dashboard.html" class="nav-link"><div class="icon-container"><i class="fa-solid fa-house"></i></div><span class="nav-text">Dashboard</span></a></li>
-            <li class="nav-item"><a href="focus.html" class="nav-link"><div class="icon-container"><i class="fa-solid fa-bullseye"></i></div><span class="nav-text">Focus</span></a></li>
-            <li class="nav-item"><a href="ai-tools.html" class="nav-link"><div class="icon-container"><i class="fa-solid fa-robot"></i></div><span class="nav-text">AI Tools</span></a></li>
-            <li class="nav-item"><a href="group-study.html" class="nav-link active"><div class="icon-container"><i class="fa-solid fa-users"></i></div><span class="nav-text">Group Study</span></a></li>
-            <li class="nav-item"><a href="tools.html" class="nav-link"><div class="icon-container"><i class="fa-solid fa-toolbox"></i></div><span class="nav-text">Tools</span></a></li>
-        </ul>
-        <ul class="nav-list bottom-menu">
-            <li class="nav-item"><a href="settings.html" class="nav-link"><div class="icon-container"><i class="fa-solid fa-gear"></i></div><span class="nav-text">Settings</span></a></li>
-            <li class="nav-item"><a href="#" class="nav-link" onclick="logout()"><div class="icon-container"><i class="fa-solid fa-right-from-bracket"></i></div><span class="nav-text">Logout</span></a></li>
-        </ul>
-    </nav>
-
-    <main class="main-container">
-        <header class="top-header">
-            <div class="search-bar glass-style"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Search rooms..."></div>
-            <div class="header-actions">
-                <i class="fa-regular fa-bell" style="font-size: 20px;"></i>
-                <div class="user-profile glass-style">
-                    <div id="profile-img-placeholder" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; border: 1px solid rgba(255,255,255,0.4);">
-                        U
-                    </div>
-                    <span id="profile-name-display">Loading...</span>
-                </div>
-                <i class="fa-solid fa-arrow-right-from-bracket" id="logout-icon" style="font-size: 20px; cursor: pointer; color: rgba(255,255,255,0.7);" title="Logout"></i>
-            </div>
-        </header>
-
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h1 class="page-title">Active Study Room</h1>
-            <button onclick="leaveRoom()" style="padding: 10px 20px; background: rgba(239, 68, 68, 0.8); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;" class="glass-style">
-                <i class="fa-solid fa-phone-slash"></i> Leave Room
-            </button>
-        </div>
-
-        <div id="jitsi-container" class="glass-style" style="width: 100%; height: 70vh; border-radius: 15px; overflow: hidden; margin-top: 15px; border: 1px solid rgba(255,255,255,0.2);"></div>
-        
-    </main>
-
-    <script src="dashboard-script.js"></script>
+    <div id="jitsi-container"></div>
+    <button id="fullscreen-btn" onclick="toggleFullScreen()">⛶ Enter Fullscreen</button>
 
     <script>
-        let api; // Make api globally accessible for the leaveRoom function
+        let api = null;
 
         window.onload = () => {
-            // Retrieve data passed from group-study.html
-            const roomName = localStorage.getItem("currentStudyRoom");
-            const userName = localStorage.getItem("studyRoomUser");
+            const baseRoomName = localStorage.getItem("currentStudyRoom");
+            let userName = localStorage.getItem("studyRoomUser");
 
-            // Redirect back if accessed directly without creating a room
-            if (!roomName) {
+            if (!baseRoomName) {
                 window.location.href = "group-study.html";
                 return;
             }
 
-            const domain = "meet.jit.si";
+            if (!userName || userName === "Loading..." || userName === "U") {
+                userName = "Edunovaq Student"; 
+            }
+
+            const domain = "8x8.vc";
+            
+            // Appends your App ID to the room name
+            const fullRoomName = `vpaas-magic-cookie-0173a0b920f94c92ba407b9fd59fc259/${baseRoomName}`;
+
             const options = {
-                roomName: roomName,
+                roomName: fullRoomName,
                 width: "100%",
                 height: "100%",
                 parentNode: document.getElementById("jitsi-container"),
+                
+                // IMPORTANT: Paste the long eyJ... string from your index.html file here
+                jwt: "eyJraWQiOiJ2cGFhcy1tYWdpYy1jb29raWUtMDE3M2EwYjkyMGY5NGM5MmJhNDA3YjlmZDU5ZmMyNTkvMmYzY2YwLVNBTVBMRV9BUFAiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJqaXRzaSIsImlzcyI6ImNoYXQiLCJpYXQiOjE3NzQ0NDE1ODcsImV4cCI6MTc3NDQ0ODc4NywibmJmIjoxNzc0NDQxNTgyLCJzdWIiOiJ2cGFhcy1tYWdpYy1jb29raWUtMDE3M2EwYjkyMGY5NGM5MmJhNDA3YjlmZDU5ZmMyNTkiLCJjb250ZXh0Ijp7ImZlYXR1cmVzIjp7ImxpdmVzdHJlYW1pbmciOmZhbHNlLCJmaWxlLXVwbG9hZCI6ZmFsc2UsIm91dGJvdW5kLWNhbGwiOmZhbHNlLCJzaXAtb3V0Ym91bmQtY2FsbCI6ZmFsc2UsInRyYW5zY3JpcHRpb24iOmZhbHNlLCJsaXN0LXZpc2l0b3JzIjpmYWxzZSwicmVjb3JkaW5nIjpmYWxzZSwiZmxpcCI6ZmFsc2V9LCJ1c2VyIjp7ImhpZGRlbi1mcm9tLXJlY29yZGVyIjpmYWxzZSwibW9kZXJhdG9yIjp0cnVlLCJuYW1lIjoiVGVzdCBVc2VyIiwiaWQiOiJnb29nbGUtb2F1dGgyfDExMDMzOTg5OTU2MDcwMjE2NjQyMCIsImF2YXRhciI6IiIsImVtYWlsIjoidGVzdC51c2VyQGNvbXBhbnkuY29tIn19LCJyb29tIjoiKiJ9.W9V-8d7nJJ5hECiTl7YPYgCxF2jeWU1dql1MFh71lx2N-acA8wELNHE-7kN5hqGeCDG1Rk7qR9v-l47NBH2vsoQkgsis9L2AQmjXdgpfPu6F7wHjLUj3JAfzXiehlwKIcTvr019Rhyg-FwOvLo0NxIVCqoMCmduO7Tu3aiY-_WQ9bBWawIasFrTeZCukcz3zDx3xR4FU8UAob5jqi2F81QgUoIEKJGTaYyuc6cKGkUJ4Ck5n6o_2cr-bDc7InUcXRR_9vmg6CUAcOx1UxT1tpXQDfhLgTFO8Bo3MXKR_8kPfy8ftpqelurH2utfMg36Qb2WOoG4RyDMOcq7zrDZ8wQ",
+
                 userInfo: {
-                    displayName: userName // Automatically sets the username
+                    displayName: userName
                 },
                 configOverwrite: {
-                    prejoinPageEnabled: false, // Skips lobby
-                    startWithAudioMuted: true,
-                    startWithVideoMuted: true
+                    prejoinPageEnabled: false, 
+                    disableDeepLinking: true,
+                    securityOptionsEnabled: false, 
+                    startWithAudioMuted: false, 
+                    startWithVideoMuted: false
                 },
                 interfaceConfigOverwrite: {
-                    SHOW_CHROME_EXTENSION_BANNER: false
+                    // With 8x8 JaaS, these flags will successfully remove the branding
+                    SHOW_JITSI_WATERMARK: false,
+                    SHOW_WATERMARK_FOR_GUESTS: false,
+                    SHOW_BRAND_WATERMARK: false,
+                    DEFAULT_LOGO_URL: '',
+                    HIDE_INVITE_MORE_HEADER: true, 
+                    SHOW_PROMOTIONAL_CLOSE_PAGE: false,
+                    TOOLBAR_BUTTONS: [
+                        'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+                        'fodeviceselection', 'hangup', 'chat', 'raisehand', 'videoquality', 'tileview'
+                    ]
                 }
             };
 
             api = new JitsiMeetExternalAPI(domain, options);
 
-            // Listen for the user hanging up via the Jitsi interface
             api.addEventListener('videoConferenceLeft', () => {
+                leaveRoom();
+            });
+            
+            api.addEventListener('readyToClose', () => {
                 leaveRoom();
             });
         };
 
-        // Function to clean up and redirect when leaving the room
         function leaveRoom() {
             if (api) {
-                api.dispose(); // Destroys the iframe
+                api.dispose(); 
             }
-            // Clear temporary data
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(err => console.log(err));
+            }
+
             localStorage.removeItem("currentStudyRoom");
             localStorage.removeItem("studyRoomUser");
-            // Redirect back to group study hub
+            
             window.location.href = "group-study.html";
+        }
+
+        // --- FULLSCREEN LOGIC ---
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Your browser blocked full-screen: ${err.message}`);
+                });
+                document.getElementById('fullscreen-btn').innerText = "🗗 Exit Fullscreen";
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    document.getElementById('fullscreen-btn').innerText = "⛶ Enter Fullscreen";
+                }
+            }
         }
     </script>
 </body>
