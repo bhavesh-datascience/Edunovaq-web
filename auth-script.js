@@ -119,7 +119,7 @@ function processAuthentication(form, endpoint, formData, type) {
     submitButton.textContent = "Processing...";
     submitButton.disabled = true;
 
-    fetch(`http://localhost:8000${endpoint}`, {
+    fetch(`http://192.168.1.17:8000${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)

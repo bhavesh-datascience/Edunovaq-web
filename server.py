@@ -17,6 +17,11 @@ import docx
 from youtube_transcript_api import YouTubeTranscriptApi
 import google.generativeai as genai
 from dotenv import load_dotenv
+import time
+import uuid
+import jwt # Ensure you installed PyJWT, NOT jwt
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 
 # ==========================================
 # 1. DATABASE CONFIGURATION (Auth DB)
@@ -179,9 +184,10 @@ class ScheduleGenRequest(BaseModel):
 # 4. APP & AI SETUP
 # ==========================================
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], # In production, change "*" to your actual domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -207,7 +213,71 @@ else:
     print("WARNING: Gemini_API_Key not found in .env file")
 
 YT_CONTEXT_MEMORY = {}
+JAAS_APP_ID = "vpaas-magic-cookie-0173a0b920f94c92ba407b9fd59fc259"
+JAAS_API_KEY_ID = "vpaas-magic-cookie-0173a0b920f94c92ba407b9fd59fc259/8847b3" # e.g., vpaas-magic-cookie-0173.../123456
+PRIVATE_KEY_PATH = "Key 3_26_2026, 2_43_10 PM.pk" # Path to the file you downloaded from 8x8
 
+def generate_jaas_token(user_name: str, user_email: str = "student@edunovaq.com", is_moderator: bool = False) -> str:
+    try:
+        # Read the private key
+        with open(PRIVATE_KEY_PATH, 'r') as key_file:
+            private_key = key_file.read()
+    except FileNotFoundError:
+        raise Exception("Private key file not found. Ensure jaas_private_key.pem is in the correct directory.")
+
+    now = int(time.time())
+    exp = now + 7200 # Token expires in 2 hours
+
+    # 8x8 specific payload structure
+    payload = {
+        "aud": "jitsi",
+        "iss": "chat",
+        "iat": now,
+        "exp": exp,
+        "nbf": now,
+        "sub": JAAS_APP_ID,
+        "room": "*", # Asterisk means this token works for ANY room name
+        "context": {
+            "features": {
+                "livestreaming": False,
+                "recording": False,
+                "outbound-call": False,
+                "sip-outbound-call": False,
+                "transcription": False
+            },
+            "user": {
+                "hidden": False,
+                "name": user_name,
+                "email": user_email,
+                "id": str(uuid.uuid4()),
+                "moderator": is_moderator
+            }
+        }
+    }
+
+    # Header requires the 'kid' (Key ID)
+    headers = {
+        "kid": JAAS_API_KEY_ID,
+        "typ": "JWT",
+        "alg": "RS256"
+    }
+
+    # Sign the token
+    token = jwt.encode(payload, private_key, algorithm="RS256", headers=headers)
+    return token
+
+# --- API Endpoint ---
+@app.get("/api/get-meet-token")
+async def get_meet_token(username: str = Query("Edunovaq Student", description="The name of the user joining the meet")):
+    """
+    Generates a secure JWT for the 8x8 JaaS meeting.
+    """
+    try:
+        token = generate_jaas_token(user_name=username)
+        return {"success": True, "token": token}
+    except Exception as e:
+        # FastAPI will automatically return a nice JSON error response
+        raise HTTPException(status_code=500, detail=str(e))
 # ==========================================
 # 5. AUTH & DASHBOARD ENDPOINTS
 # ==========================================
@@ -561,6 +631,8 @@ def generate_schedule(request: ScheduleGenRequest):
         return {"status": "success", "schedule": schedule_data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
 # ==========================================
 # 8. HTML PAGE ROUTING
 # ==========================================
