@@ -187,7 +187,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, change "*" to your actual domain
+    allow_origins=["https://edunovaq.site", "https://www.edunovaq.site"], # Update this!
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
