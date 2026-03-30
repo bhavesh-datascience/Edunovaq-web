@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,22 +14,25 @@
             gap: 25px;
             margin-top: 20px;
         }
-        .full-width { grid-column: span 2; }
-        
+
+        .full-width {
+            grid-column: span 2;
+        }
+
         .settings-input-group {
             display: flex;
             flex-direction: column;
             gap: 10px;
             margin-bottom: 20px;
         }
-        
+
         .settings-input-group label {
             color: rgba(255, 255, 255, 0.6);
             font-size: 13px;
             font-weight: 600;
             padding-left: 5px;
         }
-        
+
         .settings-input {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -39,7 +43,7 @@
             outline: none;
             transition: 0.3s;
         }
-        
+
         .settings-input:focus {
             border-color: #ffffff;
             background: rgba(255, 255, 255, 0.1);
@@ -66,6 +70,7 @@
         }
     </style>
 </head>
+
 <body>
     <nav class="sidebar glass-style">
         <div class="brand">
@@ -73,29 +78,54 @@
             <span class="nav-text brand-text">Edunovaq</span>
         </div>
         <ul class="nav-list">
-            <li class="nav-item"><a href="dashboard.html" class="nav-link"><div class="icon-container"><i class="fa-solid fa-house"></i></div><span class="nav-text">Dashboard</span></a></li>
-            <li class="nav-item"><a href="focus.html" class="nav-link"><div class="icon-container"><i class="fa-solid fa-bullseye"></i></div><span class="nav-text">Focus</span></a></li>
-            <li class="nav-item"><a href="ai-tools.html" class="nav-link"><div class="icon-container"><i class="fa-solid fa-robot"></i></div><span class="nav-text">AI Tools</span></a></li>
-            <li class="nav-item"><a href="group-study.html" class="nav-link"><div class="icon-container"><i class="fa-solid fa-users"></i></div><span class="nav-text">Group Study</span></a></li>
-            <li class="nav-item"><a href="tools.html" class="nav-link"><div class="icon-container"><i class="fa-solid fa-toolbox"></i></div><span class="nav-text">Tools</span></a></li>
+            <li class="nav-item"><a href="dashboard.html" class="nav-link">
+                    <div class="icon-container"><i class="fa-solid fa-house"></i></div><span
+                        class="nav-text">Dashboard</span>
+                </a></li>
+            <li class="nav-item"><a href="focus.html" class="nav-link">
+                    <div class="icon-container"><i class="fa-solid fa-bullseye"></i></div><span
+                        class="nav-text">Focus</span>
+                </a></li>
+            <li class="nav-item"><a href="ai-tools.html" class="nav-link">
+                    <div class="icon-container"><i class="fa-solid fa-robot"></i></div><span class="nav-text">AI
+                        Tools</span>
+                </a></li>
+            <li class="nav-item"><a href="group-study.html" class="nav-link">
+                    <div class="icon-container"><i class="fa-solid fa-users"></i></div><span class="nav-text">Group
+                        Study</span>
+                </a></li>
+            <li class="nav-item"><a href="tools.html" class="nav-link">
+                    <div class="icon-container"><i class="fa-solid fa-toolbox"></i></div><span
+                        class="nav-text">Tools</span>
+                </a></li>
         </ul>
         <ul class="nav-list bottom-menu">
-            <li class="nav-item"><a href="settings.html" class="nav-link active"><div class="icon-container"><i class="fa-solid fa-gear"></i></div><span class="nav-text">Settings</span></a></li>
-            <li class="nav-item"><a href="#" class="nav-link" id="logout-link"><div class="icon-container"><i class="fa-solid fa-right-from-bracket"></i></div><span class="nav-text">Logout</span></a></li>
+            <li class="nav-item"><a href="settings.html" class="nav-link active">
+                    <div class="icon-container"><i class="fa-solid fa-gear"></i></div><span
+                        class="nav-text">Settings</span>
+                </a></li>
+            <li class="nav-item"><a href="#" class="nav-link" id="logout-link">
+                    <div class="icon-container"><i class="fa-solid fa-right-from-bracket"></i></div><span
+                        class="nav-text">Logout</span>
+                </a></li>
         </ul>
     </nav>
 
     <main class="main-container">
-        <header class="top-header" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+        <header class="top-header"
+            style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 20px;">
-                <a href="dashboard.html" style="color: white; text-decoration: none; font-size: 24px; opacity: 0.8; transition: 0.3s;" title="Back to Dashboard">
+                <a href="dashboard.html"
+                    style="color: white; text-decoration: none; font-size: 24px; opacity: 0.8; transition: 0.3s;"
+                    title="Back to Dashboard">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
                 <h1 class="page-title" style="margin: 0;">Settings</h1>
             </div>
-            
+
             <div class="header-actions">
-                <button id="save-settings-btn" class="summarize-btn" style="background: white; color: black; border: none; padding: 10px 25px; border-radius: 20px; font-weight: 800; cursor: pointer;">
+                <button id="save-settings-btn" class="summarize-btn"
+                    style="background: white; color: black; border: none; padding: 10px 25px; border-radius: 20px; font-weight: 800; cursor: pointer;">
                     Save Changes
                 </button>
             </div>
@@ -154,7 +184,7 @@
 
             // 2. Fetch current details from DB to fill other fields
             try {
-                const response = await fetch(`http://localhost:8000/api/dashboard-stats/${userId}`);
+                const response = await fetch(`/api/dashboard-stats/${userId}`);
                 if (response.ok) {
                     // Note: Since dashboard-stats provides a subset, you may want to create 
                     // a dedicated /api/get-details/{id} endpoint for a full settings fetch.
@@ -195,7 +225,7 @@
                 };
 
                 try {
-                    const response = await fetch(`http://localhost:8000/api/update-student-details/${userId}`, {
+                    const response = await fetch(`/api/update-student-details/${userId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
@@ -223,4 +253,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -1,5 +1,5 @@
 // Apply Dark Mode immediately if saved
-(function() {
+(function () {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') { document.body.classList.add('light-mode'); }
 })();
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initStreakAndTimer();
     initDashboardCalendar();
     setupExamModal();
-    
+
     // Check if we are on the settings page to populate data
     if (window.location.pathname.includes("settings.html")) {
         populateSettingsFields();
@@ -49,7 +49,7 @@ function checkLoginStatus() {
                     if (document.getElementById("stat-progress")) {
                         fetchDashboardData(userId);
                     }
-                    loadTodayTasks(userId); 
+                    loadTodayTasks(userId);
                 } else {
                     console.warn("No user ID found! Please log out and log back in.");
                 }
@@ -71,7 +71,7 @@ function populateSettingsFields() {
 
     // Fill Inputs
     document.getElementById('set-fullname').value = user.full_name || "";
-    
+
     // Connect Save Button
     const saveBtn = document.getElementById('save-settings-btn');
     if (saveBtn) {
@@ -114,7 +114,7 @@ async function saveSettings() {
     };
 
     try {
-        const response = await fetch(`http://localhost:8000/api/update-student-details/${userId}`, {
+        const response = await fetch(`/api/update-student-details/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -150,7 +150,7 @@ function initStreakAndTimer() {
         const userId = user.id || user.user_id;
         if (!userId) return;
 
-        const today = new Date().toDateString(); 
+        const today = new Date().toDateString();
         const lastVisitKey = "lastVisitDate_id" + userId;
         const streakKey = "currentStreak_id" + userId;
         const timeKey = "dailyTimeSeconds_id" + userId;
@@ -163,13 +163,13 @@ function initStreakAndTimer() {
             if (lastVisit) {
                 let yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
-                if (lastVisit === yesterday.toDateString()) streak++; 
-                else streak = 1; 
+                if (lastVisit === yesterday.toDateString()) streak++;
+                else streak = 1;
             } else { streak = 1; }
             localStorage.setItem(lastVisitKey, today);
             localStorage.setItem(streakKey, streak);
         }
-        
+
         const streakEl = document.getElementById("stat-streak");
         if (streakEl) streakEl.textContent = streak;
 
@@ -177,7 +177,7 @@ function initStreakAndTimer() {
         let lastTimeDate = localStorage.getItem(lastTimeDateKey);
 
         if (lastTimeDate !== today) {
-            dailyTimeSeconds = 0; 
+            dailyTimeSeconds = 0;
             localStorage.setItem(lastTimeDateKey, today);
         }
 
@@ -193,16 +193,16 @@ function initStreakAndTimer() {
 
         setInterval(() => {
             dailyTimeSeconds++;
-            localStorage.setItem(timeKey, dailyTimeSeconds); 
-            if (timeEl) timeEl.textContent = formatTime(dailyTimeSeconds); 
+            localStorage.setItem(timeKey, dailyTimeSeconds);
+            if (timeEl) timeEl.textContent = formatTime(dailyTimeSeconds);
         }, 1000);
-        
+
         if (timeEl) timeEl.textContent = formatTime(dailyTimeSeconds);
     } catch (e) { console.error("Error setting up streak and timer:", e); }
 }
 
 function fetchDashboardData(userId) {
-    fetch(`http://localhost:8000/api/dashboard-stats/${userId}`)
+    fetch(`/api/dashboard-stats/${userId}`)
         .then(response => {
             if (!response.ok) throw new Error("Could not fetch stats");
             return response.json();
@@ -227,7 +227,7 @@ function renderExams(exams) {
     const examsContainer = document.getElementById("exams-container");
     if (!examsContainer) return;
     examsContainer.innerHTML = "";
-    if(exams.length === 0) {
+    if (exams.length === 0) {
         examsContainer.innerHTML = '<p style="text-align:center; opacity:0.5; font-size:12px; margin-top: 10px;">No exams added.</p>';
         return;
     }
@@ -250,7 +250,7 @@ function formatExamDate(dateStr) {
     const date = new Date(dateStr);
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     let d = date.getDate();
-    return `${months[date.getMonth()]} ${d < 10 ? '0'+d : d}`;
+    return `${months[date.getMonth()]} ${d < 10 ? '0' + d : d}`;
 }
 
 function formatExamTime(time24) {
@@ -258,8 +258,8 @@ function formatExamTime(time24) {
     let [hours, minutes] = time24.split(':');
     hours = parseInt(hours);
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12; 
-    return `${hours < 10 ? '0'+hours : hours}:${minutes} ${ampm}`;
+    hours = hours % 12 || 12;
+    return `${hours < 10 ? '0' + hours : hours}:${minutes} ${ampm}`;
 }
 
 function setupExamModal() {
@@ -268,7 +268,7 @@ function setupExamModal() {
     const overlay = document.getElementById('modal-overlay');
     const cancelBtn = document.getElementById('cancel-exam-btn');
     const saveBtn = document.getElementById('save-exam-btn');
-    if(!addBtn || !modal) return;
+    if (!addBtn || !modal) return;
     addBtn.addEventListener('click', () => {
         modal.style.display = 'block';
         overlay.style.display = 'block';
@@ -286,7 +286,7 @@ function setupExamModal() {
         const subject = document.getElementById('exam-subject-input').value.trim();
         const rawDate = document.getElementById('exam-date-input').value;
         const rawTime = document.getElementById('exam-time-input').value;
-        if(!subject || !rawDate || !rawTime) { alert("Please fill in all fields."); return; }
+        if (!subject || !rawDate || !rawTime) { alert("Please fill in all fields."); return; }
         const formattedDate = formatExamDate(rawDate);
         const formattedTime = formatExamTime(rawTime);
         currentExams.push({ subject: subject, date: formattedDate, time: formattedTime });
@@ -298,7 +298,7 @@ function setupExamModal() {
     });
 }
 
-window.deleteExam = function(index) {
+window.deleteExam = function (index) {
     currentExams.splice(index, 1);
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user.id || user.user_id;
@@ -307,7 +307,7 @@ window.deleteExam = function(index) {
 };
 
 function syncExamsToBackend(userId, exams) {
-    fetch('http://localhost:8000/api/update-exams', {
+    fetch('/api/update-exams', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, exams: exams })
@@ -321,17 +321,19 @@ function renderCharts(perfData, attData) {
     if (ctxPEl) {
         const ctxP = ctxPEl.getContext('2d');
         if (window.perfChartInstance) window.perfChartInstance.destroy();
-        const centerText = { id: 'centerText', beforeDraw: function(chart) {
-            var width = chart.width, height = chart.height, ctx = chart.ctx;
-            ctx.restore(); ctx.font = "800 24px Nunito"; ctx.fillStyle = "#fff"; ctx.textBaseline = "middle";
-            var text = perfData[0] + "%", textX = Math.round((width - ctx.measureText(text).width)/2), textY = height/2;
-            ctx.fillText(text, textX, textY); ctx.save();
-        }};
-        window.perfChartInstance = new Chart(ctxP, { 
-            type: 'doughnut', 
-            data: { datasets: [{ data: perfData, backgroundColor: ['#ffffff', 'rgba(255,255,255,0.1)'], borderWidth: 0, cutout: '80%', borderRadius: 20 }] }, 
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false}, tooltip: {enabled: false} } }, 
-            plugins: [centerText] 
+        const centerText = {
+            id: 'centerText', beforeDraw: function (chart) {
+                var width = chart.width, height = chart.height, ctx = chart.ctx;
+                ctx.restore(); ctx.font = "800 24px Nunito"; ctx.fillStyle = "#fff"; ctx.textBaseline = "middle";
+                var text = perfData[0] + "%", textX = Math.round((width - ctx.measureText(text).width) / 2), textY = height / 2;
+                ctx.fillText(text, textX, textY); ctx.save();
+            }
+        };
+        window.perfChartInstance = new Chart(ctxP, {
+            type: 'doughnut',
+            data: { datasets: [{ data: perfData, backgroundColor: ['#ffffff', 'rgba(255,255,255,0.1)'], borderWidth: 0, cutout: '80%', borderRadius: 20 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } },
+            plugins: [centerText]
         });
     }
     const ctxAEl = document.getElementById('attChart');
@@ -339,23 +341,23 @@ function renderCharts(perfData, attData) {
         const ctxA = ctxAEl.getContext('2d');
         if (window.attChartInstance) window.attChartInstance.destroy();
         let gradient = ctxA.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)'); 
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)'); 
-        window.attChartInstance = new Chart(ctxA, { 
-            type: 'line', 
-            data: { 
-                labels: ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'], 
-                datasets: [{ 
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+        window.attChartInstance = new Chart(ctxA, {
+            type: 'line',
+            data: {
+                labels: ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'],
+                datasets: [{
                     label: 'Activity', data: attData, borderColor: '#ffffff', backgroundColor: gradient,
                     borderWidth: 3, tension: 0.4, fill: true, pointRadius: 4, pointBackgroundColor: '#ffffff',
                     pointBorderColor: '#ffffff', pointBorderWidth: 1
-                }] 
-            }, 
-            options: { 
-                responsive: true, maintainAspectRatio: false, 
-                scales: { x: { grid: { display: false }, ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { size: 12 } } }, y: { display: false } }, 
-                plugins: { legend: {display: false}, tooltip: {enabled: false} } 
-            } 
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { x: { grid: { display: false }, ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { size: 12 } } }, y: { display: false } },
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            }
         });
     }
 }
@@ -364,16 +366,16 @@ async function loadTodayTasks(userId) {
     const today = new Date();
     let m = today.getMonth() + 1;
     let d = today.getDate();
-    const todayStr = `${today.getFullYear()}-${m < 10 ? '0'+m : m}-${d < 10 ? '0'+d : d}`;
+    const todayStr = `${today.getFullYear()}-${m < 10 ? '0' + m : m}-${d < 10 ? '0' + d : d}`;
     try {
-        const response = await fetch(`http://localhost:8000/api/get-schedule/${userId}`);
+        const response = await fetch(`/api/get-schedule/${userId}`);
         const data = await response.json();
         const taskContainer = document.getElementById('dashboard-tasks-container');
         if (!taskContainer) return;
         if (data.status === "success" && data.schedule && data.schedule[todayStr]) {
             const tasks = data.schedule[todayStr];
-            taskContainer.innerHTML = ''; 
-            if(tasks.length === 0) {
+            taskContainer.innerHTML = '';
+            if (tasks.length === 0) {
                 taskContainer.innerHTML = '<p style="text-align:center; opacity:0.5; font-size:12px; padding: 10px 0;">No tasks scheduled for today.</p>';
                 return;
             }
@@ -402,16 +404,16 @@ function initDashboardCalendar() {
     let date = new Date(), currYear = date.getFullYear(), currMonth = date.getMonth();
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const renderCalendar = () => {
-        let firstDayofMonth = new Date(currYear, currMonth, 1).getDay(), 
-        lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate(), 
-        lastDayofMonth = new Date(currYear, currMonth, lastDateofMonth).getDay(), 
-        lastDateofLastMonth = new Date(currYear, currMonth, 0).getDate(); 
+        let firstDayofMonth = new Date(currYear, currMonth, 1).getDay(),
+            lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate(),
+            lastDayofMonth = new Date(currYear, currMonth, lastDateofMonth).getDay(),
+            lastDateofLastMonth = new Date(currYear, currMonth, 0).getDate();
         let liTag = "";
         for (let i = firstDayofMonth; i > 0; i--) { liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`; }
-        for (let i = 1; i <= lastDateofMonth; i++) { 
+        for (let i = 1; i <= lastDateofMonth; i++) {
             let isToday = i === new Date().getDate() && currMonth === new Date().getMonth() && currYear === new Date().getFullYear() ? "active" : "";
             let m = currMonth + 1; let d = i;
-            let dateStr = `${currYear}-${m < 10 ? '0'+m : m}-${d < 10 ? '0'+d : d}`;
+            let dateStr = `${currYear}-${m < 10 ? '0' + m : m}-${d < 10 ? '0' + d : d}`;
             liTag += `<li class="${isToday} clickable-day" data-date="${dateStr}" style="cursor: pointer; position: relative; z-index: 10;" title="Add tasks for ${dateStr}">${i}</li>`;
         }
         for (let i = lastDayofMonth; i < 6; i++) { liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>` }
@@ -419,7 +421,7 @@ function initDashboardCalendar() {
         daysTag.innerHTML = liTag;
         const clickableDays = daysTag.querySelectorAll('.clickable-day');
         clickableDays.forEach(day => {
-            day.addEventListener('click', function() {
+            day.addEventListener('click', function () {
                 const selectedDate = this.getAttribute('data-date');
                 window.location.href = `calendar.html?date=${selectedDate}`;
             });
@@ -427,14 +429,14 @@ function initDashboardCalendar() {
     }
     renderCalendar();
     if (prevNextIcon) {
-        prevNextIcon.forEach(icon => { 
-            icon.addEventListener("click", () => { 
+        prevNextIcon.forEach(icon => {
+            icon.addEventListener("click", () => {
                 currMonth = icon.id === "prev" ? currMonth - 1 : currMonth + 1;
-                if(currMonth < 0 || currMonth > 11) { 
+                if (currMonth < 0 || currMonth > 11) {
                     date = new Date(currYear, currMonth, new Date().getDate());
-                    currYear = date.getFullYear(); currMonth = date.getMonth(); 
+                    currYear = date.getFullYear(); currMonth = date.getMonth();
                 } else { date = new Date(); }
-                renderCalendar(); 
+                renderCalendar();
             });
         });
     }
@@ -442,7 +444,7 @@ function initDashboardCalendar() {
 
 function logout() {
     localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('user'); 
+    localStorage.removeItem('user');
     window.location.href = 'login.html';
 }
 

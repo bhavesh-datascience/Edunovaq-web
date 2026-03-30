@@ -1,5 +1,5 @@
 // Apply Dark Mode immediately if saved
-(function() {
+(function () {
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
@@ -33,19 +33,19 @@ function initializePasswordToggle() {
 function initializePasswordStrength() {
     const passwordInput = document.getElementById("password");
     if (!passwordInput) return;
-    
+
     const strengthSegments = document.querySelectorAll(".strength-segment");
     const strengthText = document.querySelector(".strength-text");
-    
+
     passwordInput.addEventListener("input", function () {
         const password = this.value;
         let strength = 0;
-        
+
         if (password.length >= 8) strength += 1;
         if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
         if (password.match(/[0-9]/) || password.match(/[^a-zA-Z0-9]/)) strength += 1;
         if (password.length >= 12) strength += 1;
-        
+
         strengthSegments.forEach((segment, index) => {
             segment.className = "strength-segment";
             if (index < strength) {
@@ -54,9 +54,9 @@ function initializePasswordStrength() {
                 else segment.classList.add("strong");
             }
         });
-        
+
         if (password.length === 0) {
-            strengthText.textContent = "Password strength"; 
+            strengthText.textContent = "Password strength";
             strengthText.style.color = "";
         } else if (strength === 1) {
             strengthText.textContent = "Weak"; strengthText.style.color = "#ff4757";
@@ -75,9 +75,9 @@ function initializeFormValidation() {
 
     // LOGIN LOGIC
     if (loginForm) {
-        loginForm.addEventListener("submit", function(e) {
-            e.preventDefault(); 
-            
+        loginForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
             const formData = {
                 email: document.getElementById("email").value,
                 password: document.getElementById("password").value
@@ -89,12 +89,12 @@ function initializeFormValidation() {
 
     // SIGNUP LOGIC
     if (signupForm) {
-        signupForm.addEventListener("submit", function(e) {
-            e.preventDefault(); 
-            
+        signupForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirmPassword").value;
-            
+
             if (password !== confirmPassword) {
                 alert("Passwords do not match!");
                 return;
@@ -115,45 +115,46 @@ function initializeFormValidation() {
 function processAuthentication(form, endpoint, formData, type) {
     const submitButton = form.querySelector("button[type='submit']");
     const originalBtnText = submitButton.textContent;
-    
+
     submitButton.textContent = "Processing...";
     submitButton.disabled = true;
 
-    fetch(`http://localhost:8000${endpoint}`, {
+    // Use relative path so it works on localhost AND Render dynamically
+    fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
     })
-    .then(response => response.json().then(data => ({ status: response.status, body: data })))
-    .then(res => {
-        if (res.status >= 200 && res.status < 300) {
-            // SUCCESS: Details are correct, save user data
-            localStorage.setItem("isLoggedIn", "true");
-            localStorage.setItem("user", JSON.stringify(res.body.user));
-            
-            // ROUTING LOGIC: Signup goes to details, Login goes to dashboard
-            if (type === "Signup") {
-                window.location.href = "details.html";
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(res => {
+            if (res.status >= 200 && res.status < 300) {
+                // SUCCESS: Details are correct, save user data
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("user", JSON.stringify(res.body.user));
+
+                // ROUTING LOGIC: Signup goes to details, Login goes to dashboard
+                if (type === "Signup") {
+                    window.location.href = "details.html";
+                } else {
+                    window.location.href = "dashboard.html";
+                }
             } else {
-                window.location.href = "dashboard.html";
+                // FAILURE: Display the requested alert for wrong credentials
+                if (type === "Login" && res.status === 401) {
+                    alert("Wrong username or password");
+                } else {
+                    alert(res.body.detail || "An error occurred. Please try again.");
+                }
+
+                // Reset button
+                submitButton.textContent = originalBtnText;
+                submitButton.disabled = false;
             }
-        } else {
-            // FAILURE: Display the requested alert for wrong credentials
-            if (type === "Login" && res.status === 401) {
-                alert("Wrong username or password");
-            } else {
-                alert(res.body.detail || "An error occurred. Please try again.");
-            }
-            
-            // Reset button
+        })
+        .catch(error => {
+            alert("Server connection failed. Is the backend running?");
             submitButton.textContent = originalBtnText;
             submitButton.disabled = false;
-        }
-    })
-    .catch(error => {
-        alert("Server connection failed. Is the backend running?");
-        submitButton.textContent = originalBtnText;
-        submitButton.disabled = false;
-        console.error("Error:", error);
-    });
+            console.error("Error:", error);
+        });
 }

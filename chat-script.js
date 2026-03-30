@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatInput = document.getElementById('chat-input');
     const sendBtn = document.getElementById('send-btn');
     const micBtn = document.getElementById('mic-btn');
-    
+
     // Audio Control Variables
     const playBtn = document.getElementById('play-btn');
     const pauseBtn = document.getElementById('pause-btn');
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. Speech-to-Text (STT) Setup
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition;
-    
+
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.continuous = false;
@@ -47,21 +47,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // 3. Text-to-Speech (TTS) Setup & Controls
-    window.speakText = function(text) {
+    window.speakText = function (text) {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel(); // Stop current speech if any
-            
+
             // Remove Markdown symbols (* and #) so it sounds natural when spoken
             const cleanText = text.replace(/[*#]/g, '');
             const utterance = new SpeechSynthesisUtterance(cleanText);
-            
+
             utterance.lang = 'en-US';
-            utterance.rate = 1.0; 
+            utterance.rate = 1.0;
             window.speechSynthesis.speak(utterance);
         }
     };
 
-  // Play Button functionality (Resumes paused speech)
+    // Play Button functionality (Resumes paused speech)
     if (playBtn) {
         playBtn.addEventListener('click', () => {
             if ('speechSynthesis' in window && window.speechSynthesis.paused) {
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         stopBtn.addEventListener('click', () => {
             if ('speechSynthesis' in window) {
                 // THE FIX: Force a resume right before cancelling to clear browser bugs
-                window.speechSynthesis.resume(); 
+                window.speechSynthesis.resume();
                 window.speechSynthesis.cancel();
             }
         });
@@ -124,16 +124,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const loadingId = appendMessage('model', '<i class="fa-solid fa-circle-notch fa-spin"></i> Thinking...');
 
         try {
-            const response = await fetch('http://localhost:8000/api/chat', {
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    message: text, 
+                body: JSON.stringify({
+                    message: text,
                     history: memory.slice(0, -1) // Send history excluding the current message
-                }) 
+                })
             });
             const data = await response.json();
-            
+
             // Remove loading indicator
             document.getElementById(loadingId).remove();
 
@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const reply = data.reply;
                 appendMessage('model', reply);
                 memory.push({ role: 'model', content: reply });
-                
+
                 // Auto-speak response (optional, can comment this out to rely only on the speaker icon)
                 speakText(reply);
             } else {
@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         chatHistoryDiv.appendChild(msgDiv);
         chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight; // Auto-scroll to bottom
-        
+
         return uniqueId;
     }
 });

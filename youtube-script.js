@@ -3,16 +3,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const urlInput = document.getElementById('yt-url');
     const summarizeBtn = document.getElementById('summarize-btn');
     const statusMsg = document.getElementById('status-msg');
-    
+
     const summarySection = document.getElementById('summary-section');
     const summaryContent = document.getElementById('summary-content');
-    
+
     const chatSection = document.getElementById('chat-section');
     const chatHistoryDiv = document.getElementById('chat-history');
     const chatInput = document.getElementById('chat-input');
     const sendBtn = document.getElementById('send-btn');
     const micBtn = document.getElementById('mic-btn');
-    
+
     // State
     let currentVideoId = null; // Stores the active video for the chat
     let chatMemory = [];
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
         chatMemory = [];
 
         try {
-            const response = await fetch('http://localhost:8000/api/youtube-summarize', {
+            const response = await fetch('/api/youtube-summarize', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: url })
@@ -43,18 +43,18 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.status === 'success') {
                 statusMsg.style.display = 'none';
                 currentVideoId = data.video_id; // Save ID for the chat context!
-                
+
                 // Format Markdown
                 let formattedText = data.summary.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 formattedText = formattedText.replace(/\n/g, '<br>');
-                
+
                 summaryContent.innerHTML = formattedText;
                 summarySection.style.display = 'block';
-                
+
                 // Reveal Chat
                 chatSection.style.display = 'block';
                 appendMessage('model', "I have summarized the video! Ask me any specific questions about its content.");
-                
+
             } else {
                 statusMsg.style.color = '#ff4757';
                 statusMsg.innerHTML = `⚠️ Error: ${data.detail}`;
@@ -84,17 +84,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const loadingId = appendMessage('model', '<i class="fa-solid fa-circle-notch fa-spin"></i> Checking transcript...');
 
         try {
-            const response = await fetch('http://localhost:8000/api/youtube-chat', {
+            const response = await fetch('/api/youtube-chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     video_id: currentVideoId, // Pass the active video context
-                    message: text, 
-                    history: chatMemory.slice(0, -1) 
-                }) 
+                    message: text,
+                    history: chatMemory.slice(0, -1)
+                })
             });
             const data = await response.json();
-            
+
             document.getElementById(loadingId).remove();
 
             if (data.status === 'success') {
@@ -110,9 +110,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- 3. UI HELPER & TTS ---
-    window.speakText = function(text) {
+    window.speakText = function (text) {
         if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel(); 
+            window.speechSynthesis.cancel();
             const cleanText = text.replace(/[*#]/g, '');
             const utterance = new SpeechSynthesisUtterance(cleanText);
             window.speechSynthesis.speak(utterance);
@@ -153,11 +153,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 4. SPEECH TO TEXT (STT) ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition;
-    
+
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.continuous = false;
-        
+
         recognition.onstart = () => {
             micBtn.style.color = '#ff4757';
             chatInput.placeholder = "Listening...";
@@ -170,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
             micBtn.style.color = 'white';
             chatInput.placeholder = "What else would you like to know?";
         };
-        
+
         micBtn.addEventListener('click', () => {
             if (recognition) recognition.start();
         });
