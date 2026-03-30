@@ -92,17 +92,28 @@ function initializeFormValidation() {
         signupForm.addEventListener("submit", function (e) {
             e.preventDefault();
 
+            const username = document.getElementById("username").value.trim();
+            const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirmPassword").value;
 
+            // --- NEW FRONTEND VALIDATION CHECKS ---
+            if (username.length < 2) {
+                alert("Username must be at least 2 characters long.");
+                return;
+            }
+            if (password.length < 8) {
+                alert("Password must be at least 8 characters long.");
+                return;
+            }
             if (password !== confirmPassword) {
                 alert("Passwords do not match!");
                 return;
             }
 
             const formData = {
-                username: document.getElementById("username").value,
-                email: document.getElementById("email").value,
+                username: username,
+                email: email,
                 password: password
             };
 
@@ -142,6 +153,8 @@ function processAuthentication(form, endpoint, formData, type) {
                 // FAILURE: Display the requested alert for wrong credentials
                 if (type === "Login" && res.status === 401) {
                     alert("Wrong username or password");
+                } else if (res.status === 422) {
+                    alert("Validation Error: Please ensure your password is at least 8 characters long and you have entered a valid email.");
                 } else {
                     alert(res.body.detail || "An error occurred. Please try again.");
                 }
