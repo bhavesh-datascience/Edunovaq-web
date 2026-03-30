@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +8,15 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="dashboard-styles.css">
 </head>
+
 <body>
 
     <div class="auth-container-scroll">
         <div class="card glass-style auth-card details-card">
-            
+
             <div class="auth-header">
-                <div class="icon-wrapper" style="margin: 0 auto 20px auto; width: 60px; height: 60px; font-size: 24px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <div class="icon-wrapper"
+                    style="margin: 0 auto 20px auto; width: 60px; height: 60px; font-size: 24px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                     <i class="fa-solid fa-graduation-cap"></i>
                 </div>
                 <h2>Complete Your Profile</h2>
@@ -22,9 +25,9 @@
 
             <form id="details-form">
                 <div class="form-grid">
-                    
+
                     <h3 class="section-title">Personal Details</h3>
-                    
+
                     <div style="text-align: left;">
                         <label>Full Name</label>
                         <input type="text" id="full_name" placeholder="Leslie Alexander" required>
@@ -38,7 +41,8 @@
                             <option value="Female">Female</option>
                             <option value="Other">Other</option>
                         </select>
-                        <input type="text" id="other_gender" class="hidden" placeholder="Please specify gender" style="margin-top: 8px;">
+                        <input type="text" id="other_gender" class="hidden" placeholder="Please specify gender"
+                            style="margin-top: 8px;">
                     </div>
 
                     <div style="text-align: left;">
@@ -77,26 +81,38 @@
                         <label>Class / Degree</label>
                         <select id="class_standard" required>
                             <option value="" disabled selected>Select your Class / Degree</option>
-                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-                            <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
-                            <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
                             <option value="Bachelor's Degree">Bachelor's Degree</option>
                             <option value="Master's Degree">Master's Degree</option>
                             <option value="Other Degree">Other Degree</option>
                         </select>
-                        <input type="text" id="other_class" class="hidden" placeholder="Please specify your degree" style="margin-top: 8px;">
+                        <input type="text" id="other_class" class="hidden" placeholder="Please specify your degree"
+                            style="margin-top: 8px;">
                     </div>
 
                     <div class="full-width hidden" id="course_group" style="text-align: left;">
                         <label>Course / Major</label>
                         <select id="course"></select>
-                        <input type="text" id="other_course" class="hidden" placeholder="Please specify your course" style="margin-top: 8px;">
+                        <input type="text" id="other_course" class="hidden" placeholder="Please specify your course"
+                            style="margin-top: 8px;">
                     </div>
 
                     <div class="full-width hidden" id="board_group" style="text-align: left;">
                         <label>Board</label>
                         <select id="board"></select>
-                        <input type="text" id="other_board" class="hidden" placeholder="Please specify your board" style="margin-top: 8px;">
+                        <input type="text" id="other_board" class="hidden" placeholder="Please specify your board"
+                            style="margin-top: 8px;">
                     </div>
 
                     <div class="hidden" id="stream_group" style="text-align: left;">
@@ -122,13 +138,16 @@
                         <div id="exam_prep_container" class="checkbox-container">
                             <label class="checkbox-item"><input type="checkbox" value="JEE"> JEE</label>
                             <label class="checkbox-item"><input type="checkbox" value="NEET"> NEET</label>
-                            <label class="checkbox-item"><input type="checkbox" value="CA Foundation"> CA Foundation</label>
+                            <label class="checkbox-item"><input type="checkbox" value="CA Foundation"> CA
+                                Foundation</label>
                             <label class="checkbox-item"><input type="checkbox" value="CUET"> CUET</label>
                             <label class="checkbox-item"><input type="checkbox" value="Board Exams"> Board Exams</label>
                             <label class="checkbox-item"><input type="checkbox" value="Olympiads"> Olympiads</label>
-                            <label class="checkbox-item"><input type="checkbox" id="exam_prep_other_checkbox" value="Other"> Other</label>
+                            <label class="checkbox-item"><input type="checkbox" id="exam_prep_other_checkbox"
+                                    value="Other"> Other</label>
                         </div>
-                        <input type="text" id="other_exam_prep" class="hidden" placeholder="Please specify exam" style="margin-top: 8px;">
+                        <input type="text" id="other_exam_prep" class="hidden" placeholder="Please specify exam"
+                            style="margin-top: 8px;">
                     </div>
 
                     <div style="text-align: left;">
@@ -151,9 +170,12 @@
 
                 </div>
 
-                <div id="form-errors" style="color: #ff4757; font-size: 14px; font-weight: 700; text-align: center; margin-top: 20px;"></div>
+                <div id="form-errors"
+                    style="color: #ff4757; font-size: 14px; font-weight: 700; text-align: center; margin-top: 20px;">
+                </div>
 
-                <button type="submit" class="hero-btn" style="width: 100%; border: none; margin-top: 25px;">Save & Enter Dashboard</button>
+                <button type="submit" class="hero-btn" style="width: 100%; border: none; margin-top: 25px;">Save & Enter
+                    Dashboard</button>
             </form>
         </div>
     </div>
@@ -167,14 +189,14 @@
         const streamSelect = document.getElementById('stream');
         const subjectsGroup = document.getElementById('subjects_group');
         const subjectsContainer = document.getElementById('subjects_container');
-        
+
         const courseGroup = document.getElementById('course_group');
         const courseSelect = document.getElementById('course');
 
         // Data Arrays
         const boards9_10 = ["CBSE", "ICSE", "SSC (State Board)", "Other"];
         const boards11_12 = ["CBSE", "ICSE", "State Board", "NIOS", "Other"];
-        
+
         const bachelorsCourses = ["B.Tech / B.E.", "B.Sc", "B.A.", "B.Com", "BBA", "MBBS / BDS", "BCA", "LLB", "Other"];
         const mastersCourses = ["M.Tech / M.E.", "M.Sc", "M.A.", "M.Com", "MBA", "MD / MS", "MCA", "LLM", "Other"];
         const otherCourses = ["Diploma", "PhD", "Certification", "Post Graduate Diploma", "Other"];
@@ -188,7 +210,7 @@
 
         // --- DYNAMIC "OTHER" FIELDS LOGIC FOR DROPDOWNS ---
         function attachOtherListener(selectId, otherInputId, triggerValues) {
-            document.getElementById(selectId).addEventListener('change', function() {
+            document.getElementById(selectId).addEventListener('change', function () {
                 const otherInput = document.getElementById(otherInputId);
                 if (triggerValues.includes(this.value)) {
                     otherInput.classList.remove('hidden');
@@ -208,7 +230,7 @@
         attachOtherListener('board', 'other_board', ['Other']);
 
         // --- NEW: DYNAMIC "OTHER" FIELD LOGIC FOR EXAM CHECKBOX ---
-        document.getElementById('exam_prep_other_checkbox').addEventListener('change', function() {
+        document.getElementById('exam_prep_other_checkbox').addEventListener('change', function () {
             const otherInput = document.getElementById('other_exam_prep');
             if (this.checked) {
                 otherInput.classList.remove('hidden');
@@ -232,34 +254,34 @@
         }
 
         // Class/Degree Change Logic
-        classSelect.addEventListener('change', function() {
+        classSelect.addEventListener('change', function () {
             const val = this.value;
             const numVal = parseInt(val);
-            
+
             // Hide & Reset everything first
             boardGroup.classList.add('hidden');
             streamGroup.classList.add('hidden');
             subjectsGroup.classList.add('hidden');
             courseGroup.classList.add('hidden');
-            
+
             boardSelect.innerHTML = '';
             streamSelect.value = '';
             courseSelect.innerHTML = '';
             subjectsContainer.innerHTML = '';
-            
+
             // Reset "Other" dynamic fields
             document.getElementById('other_course').classList.add('hidden');
             document.getElementById('other_board').classList.add('hidden');
             document.getElementById('other_course').value = '';
             document.getElementById('other_board').value = '';
 
-            boardGroup.classList.remove('full-width'); 
+            boardGroup.classList.remove('full-width');
 
             if (!isNaN(numVal)) {
                 // School Student (1-12)
                 if (numVal >= 9 && numVal <= 10) {
                     boardGroup.classList.remove('hidden');
-                    boardGroup.classList.add('full-width'); 
+                    boardGroup.classList.add('full-width');
                     populateDropdown(boardSelect, boards9_10);
                 } else if (numVal >= 11 && numVal <= 12) {
                     boardGroup.classList.remove('hidden');
@@ -280,7 +302,7 @@
         });
 
         // Stream Change Logic -> Populates Checkboxes
-        streamSelect.addEventListener('change', function() {
+        streamSelect.addEventListener('change', function () {
             subjectsGroup.classList.remove('hidden');
             populateCheckboxes(subjectsContainer, subjectsMap[this.value]);
         });
@@ -302,14 +324,14 @@
             optionsArray.forEach(opt => {
                 const label = document.createElement('label');
                 label.className = 'checkbox-item';
-                
+
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.value = opt;
-                
+
                 label.appendChild(checkbox);
                 label.appendChild(document.createTextNode(' ' + opt));
-                
+
                 containerElement.appendChild(label);
             });
         }
@@ -322,7 +344,7 @@
         }
 
         // Form Submit
-        document.getElementById('details-form').addEventListener('submit', function(e) {
+        document.getElementById('details-form').addEventListener('submit', function (e) {
             e.preventDefault();
             const btn = this.querySelector('button[type="submit"]');
             btn.textContent = "Saving...";
@@ -343,7 +365,7 @@
             const payload = {
                 personal_details: {
                     full_name: document.getElementById('full_name').value,
-                    gender: getFinalTextValue('gender', 'other_gender', ['Other']), 
+                    gender: getFinalTextValue('gender', 'other_gender', ['Other']),
                     date_of_birth: document.getElementById('dob').value,
                     email: document.getElementById('email').value,
                     mobile_number: document.getElementById('mobile').value,
@@ -367,45 +389,46 @@
                 }
             };
 
-            fetch('http://localhost:8000/api/save-details', {
+            fetch('/api/save-details', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
-            .then(res => res.json().then(data => ({status: res.status, body: data})))
-            .then(res => {
-                if(res.status === 200) {
-                    window.location.href = "dashboard.html";
-                } else {
-                    document.getElementById('form-errors').textContent = res.body.detail || "Failed to save details.";
+                .then(res => res.json().then(data => ({ status: res.status, body: data })))
+                .then(res => {
+                    if (res.status === 200) {
+                        window.location.href = "dashboard.html";
+                    } else {
+                        document.getElementById('form-errors').textContent = res.body.detail || "Failed to save details.";
+                        btn.textContent = 'Save & Enter Dashboard';
+                        btn.disabled = false;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('form-errors').textContent = "Server connection failed.";
                     btn.textContent = 'Save & Enter Dashboard';
                     btn.disabled = false;
-                }
-            })
-            .catch(err => {
-                document.getElementById('form-errors').textContent = "Server connection failed.";
-                btn.textContent = 'Save & Enter Dashboard';
-                btn.disabled = false;
-            });
+                });
         });
 
         // Pre-fill email and name if available in localStorage
-        window.onload = function() {
+        window.onload = function () {
             const userData = localStorage.getItem('user');
-            if(userData) {
+            if (userData) {
                 try {
                     const user = JSON.parse(userData);
-                    if(user.email) {
+                    if (user.email) {
                         document.getElementById('email').value = user.email;
-                        document.getElementById('email').readOnly = true; 
-                        document.getElementById('email').style.opacity = '0.7'; 
+                        document.getElementById('email').readOnly = true;
+                        document.getElementById('email').style.opacity = '0.7';
                     }
-                    if(user.full_name) {
+                    if (user.full_name) {
                         document.getElementById('full_name').value = user.full_name;
                     }
-                } catch(e) {}
+                } catch (e) { }
             }
         };
     </script>
 </body>
+
 </html>
