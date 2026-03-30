@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+bcrypt
+requests
+python-docx
+youtube-transcript-api
+google-generativeai
+python-dotenv
+PyJWT
+python-multipart
+pydantic[email]
