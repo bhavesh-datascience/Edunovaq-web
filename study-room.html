@@ -46,6 +46,7 @@
 
             let dynamicJwt = "";
             try {
+                // CHANGED: Removed http://127.0.0.1:8000 to use a relative path
                 const response = await fetch(`/api/get-meet-token?username=${encodeURIComponent(userName)}`);
                 const data = await response.json();
                 
