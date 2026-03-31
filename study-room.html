@@ -46,7 +46,7 @@
 
             let dynamicJwt = "";
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/get-meet-token?username=${encodeURIComponent(userName)}`);
+                const response = await fetch(`/api/get-meet-token?username=${encodeURIComponent(userName)}`);
                 const data = await response.json();
                 
                 if (data.success) {
