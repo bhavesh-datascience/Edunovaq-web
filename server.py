@@ -484,6 +484,7 @@ def chat_with_ai(request: ChatRequest):
 
 
 @app.post("/api/youtube-summarize")
+@app.post("/api/youtube-summarize")
 def summarize_youtube_video(request: YouTubeRequest):
     try:
         # Extract Video ID
@@ -503,19 +504,24 @@ def summarize_youtube_video(request: YouTubeRequest):
             title = "Unknown Title"
             author = "Unknown Channel"
 
-        # --- COOKIES METHOD IMPLEMENTATION ---
+        # --- UPDATED COOKIES METHOD (V1.0.0+ Syntax) ---
         try:
-            # Verify if cookies file exists to avoid crashes
             if not os.path.exists('cookies.txt'):
                 raise Exception("cookies.txt file not found in root directory.")
 
-            # Initialize API with the cookies file
-            # This allows the server to act as a logged-in user
-            transcript_list = YouTubeTranscriptApi.get_transcript(video_id, cookies='cookies.txt')
+            # 1. Initialize the API object with your cookies file
+            ytt_api = YouTubeTranscriptApi(cookies='cookies.txt')
+            
+            # 2. Use the .fetch() method instead of get_transcript()
+            fetched_data = ytt_api.fetch(video_id)
+            
+            # 3. Convert the object data to a list of dictionaries
+            transcript_list = fetched_data.to_raw_data()
+            
             transcript_text = " ".join([entry['text'] for entry in transcript_list])
             
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Transcript blocked or file missing: {str(e)}")
+            raise HTTPException(status_code=400, detail=f"Transcript error: {str(e)}")
         
         # Store context for follow-up chat
         full_context = f"Video Title: {title}\nChannel: {author}\nTranscript: {transcript_text}"
@@ -523,18 +529,14 @@ def summarize_youtube_video(request: YouTubeRequest):
 
         # Generate Summary using Gemini
         prompt = f"""You are an expert tutor. I am providing you with the transcript of a YouTube video titled "{title}" by "{author}". 
-        Please provide: 
-        1. A brief 2-sentence overview. 
-        2. A bulleted list of the Core Concepts & Key Takeaways. 
-        Use Markdown formatting. 
-        Transcript: {transcript_text[:60000]}"""
+        Please provide: 1. A brief 2-sentence overview. 2. A bulleted list of the Core Concepts & Key Takeaways. 
+        Use Markdown formatting. Transcript: {transcript_text[:60000]}"""
         
         response = model.generate_content(prompt)
         return {"status": "success", "summary": response.text, "video_id": video_id}
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Could not process video: {str(e)}")
-@app.post("/api/youtube-chat")
+        raise HTTPException(status_code=500, detail=f"Could not process video: {str(e)}")@app.post("/api/youtube-chat")
 def chat_with_youtube_video(request: YouTubeChatRequest):
     try:
         video_context = YT_CONTEXT_MEMORY.get(request.video_id, "")
