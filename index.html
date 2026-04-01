@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edunovaq - AI-Powered Student Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #0f172a; /* Deep slate background */
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Glowing Orbs for 3D depth */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+        .orb-1 {
+            width: 400px; height: 400px;
+            background: rgba(59, 130, 246, 0.4); /* Blue */
+            top: -100px; left: -100px;
+        }
+        .orb-2 {
+            width: 500px; height: 500px;
+            background: rgba(139, 92, 246, 0.3); /* Purple */
+            bottom: 100px; right: -150px;
+            animation-delay: -5s;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* Glassmorphism Classes */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 3D Button Effect */
+        .btn-3d {
+            transition: all 0.15s ease;
+            box-shadow: 0 6px 0 #1e3a8a, 0 15px 20px rgba(0,0,0,0.4);
+        }
+        .btn-3d:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 #1e3a8a, 0 5px 10px rgba(0,0,0,0.4);
+        }
+    </style>
+</head>
+<body class="relative min-h-screen">
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <header class="fixed w-full top-0 z-50 glass border-b-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center gap-3">
+                    <img src="/1.webp" onerror="this.style.display='none'" class="h-10 w-10 rounded-xl" alt="Logo">
+                    <span class="text-3xl font-black tracking-tight text-white drop-shadow-lg">
+                        Edunovaq
+                    </span>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="/loginpage" class="text-gray-300 hover:text-white font-semibold transition-colors">Log in</a>
+                    <a href="/signuppage" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-full font-bold transition-colors shadow-lg shadow-blue-500/30">
+                        Sign up free
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="pt-40 pb-20 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="max-w-4xl mx-auto" data-tilt data-tilt-max="3" data-tilt-speed="400" data-tilt-perspective="1000">
+                <div class="inline-block mb-4 px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 font-semibold text-sm backdrop-blur-md">
+                    🚀 Next-Gen AI Study Workspace
+                </div>
+                <h1 class="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-tight">
+                    Study Smarter. <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 drop-shadow-sm">
+                        Not Harder.
+                    </span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+                    Instantly chat with your PDFs, summarize YouTube lectures, and let AI generate your perfect daily study schedule.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-6">
+                    <a href="/signuppage" class="btn-3d bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold text-xl tracking-wide">
+                        Start Learning Now
+                    </a>
+                    <a href="/loginpage" class="glass text-white px-10 py-4 rounded-2xl font-bold text-xl tracking-wide hover:bg-white/10 transition-colors">
+                        Go to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <div class="glass p-8 rounded-3xl transform transition duration-500 hover:-translate-y-2" data-tilt data-tilt-glare data-tilt-max-glare="0.2" data-tilt-max="10" data-tilt-scale="1.05">
+                    <div class="w-14 h-14 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mb-6 shadow-inner border border-blue-500/30">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Chat with Files</h3>
+                    <p class="text-gray-400 leading-relaxed">Upload any PDF or paste a YouTube link. Our AI reads the transcript and answers your questions instantly.</p>
+                </div>
+
+                <div class="glass p-8 rounded-3xl transform transition duration-500 hover:-translate-y-2" data-tilt data-tilt-glare data-tilt-max-glare="0.2" data-tilt-max="10" data-tilt-scale="1.05">
+                    <div class="w-14 h-14 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mb-6 shadow-inner border border-purple-500/30">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">AI Scheduling</h3>
+                    <p class="text-gray-400 leading-relaxed">Tell the AI your goals, and it will auto-generate a structured, optimized daily timetable to keep you focused.</p>
+                </div>
+
+                <div class="glass p-8 rounded-3xl transform transition duration-500 hover:-translate-y-2" data-tilt data-tilt-glare data-tilt-max-glare="0.2" data-tilt-max="10" data-tilt-scale="1.05">
+                    <div class="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 shadow-inner border border-emerald-500/30">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Deep Focus</h3>
+                    <p class="text-gray-400 leading-relaxed">Engage with built-in Pomodoro timers, visual tracking, and collaborative 8x8 JaaS study rooms.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/10 mt-12 py-10 relative z-10 glass rounded-t-3xl">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-2xl font-black tracking-tight text-white mb-2">Edunovaq</h2>
+            <p class="text-gray-500 mb-6">Built for the future of learning.</p>
+            <div class="text-sm text-gray-600">
+                &copy; 2026 Edunovaq. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+            reverse: false,
+            max: 15,
+            perspective: 1000,
+            scale: 1.05,
+            speed: 1000,
+            transition: true,
+            axis: null,
+            reset: true,
+            easing: "cubic-bezier(.03,.98,.52,.99)",
+        });
+    </script>
+</body>
+</html>
