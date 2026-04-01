@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
         formData.append("file", file);
 
         try {
-            const response = await fetch('http://localhost:8000/api/upload-pdf', {
+            const response = await fetch('/api/upload-pdf', {
                 method: 'POST',
                 body: formData
             });
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const loadingId = appendMessage('model', '<i class="fa-solid fa-circle-notch fa-spin"></i> Reading Document...');
 
         try {
-            const response = await fetch('http://localhost:8000/api/chat-pdf', {
+            const response = await fetch('/api/chat-pdf', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
