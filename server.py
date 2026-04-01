@@ -21,13 +21,27 @@ import time
 import uuid
 import jwt # Ensure you installed PyJWT, NOT jwt
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.middleware.cors import CORSMiddleware
+
+# ==========================================
+# 0. DYNAMIC DATABASE SETUP (Postgres / SQLite)
+# ==========================================
+# Get the Database URL from Render's environment, fallback to local SQLite for testing
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./local_combined.db")
+
+# SQLAlchemy requires 'postgresql://' but Supabase sometimes gives 'postgres://'
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# SQLite needs specific connect_args, Postgres does not
+if DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+else:
+    engine = create_engine(DATABASE_URL) # Cloud Postgres configuration
+
 
 # ==========================================
 # 1. DATABASE CONFIGURATION (Auth DB)
 # ==========================================
-SQLALCHEMY_DATABASE_URL = "sqlite:///./medboard.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -59,9 +73,8 @@ Base.metadata.create_all(bind=engine)
 # ==========================================
 # 2. DETAILS DATABASE CONFIGURATION
 # ==========================================
-DETAILS_DATABASE_URL = "sqlite:///./details.db"
-details_engine = create_engine(DETAILS_DATABASE_URL, connect_args={"check_same_thread": False})
-DetailsSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=details_engine)
+# Pointing the details database to the exact same engine
+DetailsSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 DetailsBase = declarative_base()
 
 def get_details_db():
@@ -102,7 +115,7 @@ class UserExam(DetailsBase):
     user_id = Column(Integer, primary_key=True, index=True)
     exams_json = Column(String, default="[]")
 
-DetailsBase.metadata.create_all(bind=details_engine)
+DetailsBase.metadata.create_all(bind=engine)
 
 # ==========================================
 # 3. PYDANTIC SCHEMAS 
@@ -185,9 +198,15 @@ class ScheduleGenRequest(BaseModel):
 # ==========================================
 app = FastAPI()
 
+# SECURITY UPDATE: Restrict CORS to your domain and local testing
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://edunovaq.site", "https://www.edunovaq.site"], # Update this!
+    allow_origins=[
+        "https://edunovaq.site", 
+        "https://www.edunovaq.site", 
+        "http://localhost:8000",
+        "http://127.0.0.1:8000"
+    ], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -210,7 +229,7 @@ if gemini_api_key:
     genai.configure(api_key=gemini_api_key)
     model = genai.GenerativeModel('gemini-2.5-flash')
 else:
-    print("WARNING: Gemini_API_Key not found in .env file")
+    print("WARNING: Gemini_API_Key not found in environment variables")
 
 YT_CONTEXT_MEMORY = {}
 JAAS_APP_ID = "vpaas-magic-cookie-0173a0b920f94c92ba407b9fd59fc259"
@@ -322,7 +341,6 @@ def save_student_details(payload: StudentDetailsPayload, db: Session = Depends(g
     db.commit()
     return {"message": "Student details saved successfully"}
 
-# NEW: Update Student Details Endpoint for Settings Page
 @app.put("/api/update-student-details/{user_id}")
 def update_student_details(user_id: int, payload: StudentDetailsPayload, db: Session = Depends(get_details_db)):
     # Find the existing record in the student_details table
@@ -480,10 +498,7 @@ def summarize_youtube_video(request: YouTubeRequest):
             title = "Unknown Title"
             author = "Unknown Channel"
 
-        # Create an instance of the API first
         ytt_api = YouTubeTranscriptApi()
-        
-        # Fetch the transcript and convert it to the raw dictionary format
         fetched_data = ytt_api.fetch(video_id)
         transcript_list = fetched_data.to_raw_data()
         
@@ -566,6 +581,7 @@ def chat_with_pdf(request: PDFChatRequest):
         return {"status": "success", "reply": response.text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 class ChartRequest(BaseModel):
     prompt: str
     category: str # Added category field
@@ -573,7 +589,6 @@ class ChartRequest(BaseModel):
 @app.post("/api/generate-chart")
 def generate_mermaid_chart(request: ChartRequest):
     try:
-        # Expanded syntax guide for the new categories
         syntax_guide = {
             "flowchart": "Use 'graph TD' or 'graph LR'.",
             "pie chart": "Use 'pie title [Title]' syntax.",
@@ -595,7 +610,6 @@ def generate_mermaid_chart(request: ChartRequest):
         """
         
         response = model.generate_content(prompt)
-        # Clean potential markdown formatting
         clean_code = response.text.replace("```mermaid", "").replace("```", "").strip()
         
         return {"status": "success", "mermaid_code": clean_code}
@@ -605,7 +619,6 @@ def generate_mermaid_chart(request: ChartRequest):
 @app.post("/api/generate-schedule")
 def generate_schedule(request: ScheduleGenRequest):
     try:
-        # Prompt explicitly asks for a JSON array to make table generation easy on the frontend
         prompt = f"""
         You are an expert time management and productivity assistant. 
         Create a practical, well-structured daily schedule based on this user input: "{request.prompt}"
@@ -618,14 +631,11 @@ def generate_schedule(request: ScheduleGenRequest):
         """
         
         response = model.generate_content(prompt)
-        
-        # Clean potential markdown formatting
         clean_json = response.text.replace("```json", "").replace("```", "").strip()
         
         try:
             schedule_data = json.loads(clean_json)
         except json.JSONDecodeError:
-            # Fallback in case the AI outputs conversational text instead of strict JSON
             schedule_data = [{"time": "Error", "task": "Formatting Issue", "description": clean_json}]
             
         return {"status": "success", "schedule": schedule_data}
@@ -645,8 +655,6 @@ def get_details_page():
     if not os.path.exists("details.html"): raise HTTPException(status_code=404, detail="details.html not found")
     return FileResponse("details.html")
 app.mount("/", StaticFiles(directory=".", html=True), name="static")
-
-
 
 if __name__ == "__main__":
     import uvicorn
