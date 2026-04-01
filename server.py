@@ -498,11 +498,22 @@ def summarize_youtube_video(request: YouTubeRequest):
             title = "Unknown Title"
             author = "Unknown Channel"
 
-        ytt_api = YouTubeTranscriptApi()
-        fetched_data = ytt_api.fetch(video_id)
-        transcript_list = fetched_data.to_raw_data()
+        # --- NEW PROXY CONFIGURATION ---
+        # Get the proxy URL from environment variables for security
+        proxy_url = os.getenv("YOUTUBE_PROXY_URL")
         
-        transcript_text = " ".join([entry['text'] for entry in transcript_list])
+        try:
+            if proxy_url:
+                # Format required by the youtube-transcript-api
+                proxies = {"http": proxy_url, "https": proxy_url}
+                transcript_list = YouTubeTranscriptApi.get_transcript(video_id, proxies=proxies)
+            else:
+                # Fallback to normal request if no proxy is set (e.g., for local testing)
+                transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
+                
+            transcript_text = " ".join([entry['text'] for entry in transcript_list])
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Transcript blocked. If on Render, verify your YOUTUBE_PROXY_URL is correct. Error details: {str(e)}")
         
         full_context = f"Video Title: {title}\nChannel: {author}\nTranscript: {transcript_text}"
         YT_CONTEXT_MEMORY[video_id] = full_context
@@ -513,7 +524,6 @@ def summarize_youtube_video(request: YouTubeRequest):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Could not process video: {str(e)}")
-
 @app.post("/api/youtube-chat")
 def chat_with_youtube_video(request: YouTubeChatRequest):
     try:
