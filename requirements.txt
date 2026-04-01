@@ -11,3 +11,4 @@ python-dotenv
 PyJWT
 python-multipart
 pydantic[email]
+psycopg2-binary==2.9.9
