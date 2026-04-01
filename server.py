@@ -482,13 +482,18 @@ def chat_with_ai(request: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/api/youtube-summarize")
 def summarize_youtube_video(request: YouTubeRequest):
     try:
+        # Extract Video ID
         match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", request.url)
-        if match: video_id = match.group(1)
-        else: raise HTTPException(status_code=400, detail="Invalid YouTube URL.")
+        if match: 
+            video_id = match.group(1)
+        else: 
+            raise HTTPException(status_code=400, detail="Invalid YouTube URL.")
 
+        # Fetch Metadata
         oembed_url = f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={video_id}&format=json"
         try:
             yt_meta = requests.get(oembed_url).json()
@@ -498,27 +503,32 @@ def summarize_youtube_video(request: YouTubeRequest):
             title = "Unknown Title"
             author = "Unknown Channel"
 
-        # --- NEW PROXY CONFIGURATION ---
-        # Get the proxy URL from environment variables for security
-        proxy_url = os.getenv("YOUTUBE_PROXY_URL")
-        
+        # --- COOKIES METHOD IMPLEMENTATION ---
         try:
-            if proxy_url:
-                # Format required by the youtube-transcript-api
-                proxies = {"http": proxy_url, "https": proxy_url}
-                transcript_list = YouTubeTranscriptApi.get_transcript(video_id, proxies=proxies)
-            else:
-                # Fallback to normal request if no proxy is set (e.g., for local testing)
-                transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
-                
+            # Verify if cookies file exists to avoid crashes
+            if not os.path.exists('cookies.txt'):
+                raise Exception("cookies.txt file not found in root directory.")
+
+            # Initialize API with the cookies file
+            # This allows the server to act as a logged-in user
+            transcript_list = YouTubeTranscriptApi.get_transcript(video_id, cookies='cookies.txt')
             transcript_text = " ".join([entry['text'] for entry in transcript_list])
+            
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Transcript blocked. If on Render, verify your YOUTUBE_PROXY_URL is correct. Error details: {str(e)}")
+            raise HTTPException(status_code=400, detail=f"Transcript blocked or file missing: {str(e)}")
         
+        # Store context for follow-up chat
         full_context = f"Video Title: {title}\nChannel: {author}\nTranscript: {transcript_text}"
         YT_CONTEXT_MEMORY[video_id] = full_context
 
-        prompt = f"""You are an expert tutor. I am providing you with the transcript of a YouTube video titled "{title}" by "{author}". Please provide: 1. A brief 2-sentence overview. 2. A bulleted list of the Core Concepts & Key Takeaways. Use Markdown formatting. Transcript: {transcript_text[:60000]} """
+        # Generate Summary using Gemini
+        prompt = f"""You are an expert tutor. I am providing you with the transcript of a YouTube video titled "{title}" by "{author}". 
+        Please provide: 
+        1. A brief 2-sentence overview. 
+        2. A bulleted list of the Core Concepts & Key Takeaways. 
+        Use Markdown formatting. 
+        Transcript: {transcript_text[:60000]}"""
+        
         response = model.generate_content(prompt)
         return {"status": "success", "summary": response.text, "video_id": video_id}
         
