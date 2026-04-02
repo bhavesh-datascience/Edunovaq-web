@@ -218,7 +218,9 @@ function fetchDashboardData(userId) {
 
             currentExams = data.upcoming_exams || [];
             renderExams(currentExams);
-            renderCharts(data.charts.performance, data.charts.attendance);
+            
+            // Pass the dynamic attendance labels returning from the backend
+            renderCharts(data.charts.performance, data.charts.attendance, data.charts.attendance_labels);
         })
         .catch(error => console.error("Error fetching dashboard data:", error));
 }
@@ -314,11 +316,29 @@ function syncExamsToBackend(userId, exams) {
     }).catch(error => console.error("Error saving exams:", error));
 }
 
-function renderCharts(perfData, attData) {
-    Chart.defaults.color = '#fff';
-    Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+// Added dynamic label support and layout heights to fix invisible chart bug
+function renderCharts(perfData, attData, attLabels) {
+    // Fallback if labels aren't provided by API
+    if (!attLabels) {
+        attLabels = ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'];
+    }
+
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.color = '#fff';
+        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+    } else {
+        console.error("Chart.js is not loaded.");
+        return;
+    }
+
     const ctxPEl = document.getElementById('perfChart');
     if (ctxPEl) {
+        // Guarantee visibility: force parent container height
+        if(ctxPEl.parentElement) {
+            ctxPEl.parentElement.style.position = 'relative';
+            ctxPEl.parentElement.style.minHeight = '200px'; 
+        }
+
         const ctxP = ctxPEl.getContext('2d');
         if (window.perfChartInstance) window.perfChartInstance.destroy();
         const centerText = {
@@ -336,8 +356,15 @@ function renderCharts(perfData, attData) {
             plugins: [centerText]
         });
     }
+
     const ctxAEl = document.getElementById('attChart');
     if (ctxAEl) {
+        // Guarantee visibility: force parent container height
+        if(ctxAEl.parentElement) {
+            ctxAEl.parentElement.style.position = 'relative';
+            ctxAEl.parentElement.style.minHeight = '200px'; 
+        }
+
         const ctxA = ctxAEl.getContext('2d');
         if (window.attChartInstance) window.attChartInstance.destroy();
         let gradient = ctxA.createLinearGradient(0, 0, 0, 300);
@@ -346,7 +373,7 @@ function renderCharts(perfData, attData) {
         window.attChartInstance = new Chart(ctxA, {
             type: 'line',
             data: {
-                labels: ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'],
+                labels: attLabels, // Utilizing dynamic labels
                 datasets: [{
                     label: 'Activity', data: attData, borderColor: '#ffffff', backgroundColor: gradient,
                     borderWidth: 3, tension: 0.4, fill: true, pointRadius: 4, pointBackgroundColor: '#ffffff',
