@@ -24,7 +24,7 @@
    ===================================================================== */
 body {
     /* Reference: dark navy left, deep indigo/blue center, slightly lighter blue-purple right */
-    background-color: #0b1120;
+   background: linear-gradient(115deg, #2c3e50, #505380);
     background-size: cover;
     background-attachment: fixed;
     height: 100vh;

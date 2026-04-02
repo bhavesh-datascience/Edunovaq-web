@@ -654,7 +654,8 @@ def get_signup_page(): return FileResponse("signup.html")
 def get_details_page():
     if not os.path.exists("details.html"): raise HTTPException(status_code=404, detail="details.html not found")
     return FileResponse("details.html")
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
+
+app.mount("/", StaticFiles(directory=" ", html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn
